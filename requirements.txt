@@ -1,0 +1,11 @@
+torch==2.7.0
+torchvision==0.2.0
+imageio==2.5.0
+numpy
+opencv-python
+# scikit-image==0.24.0
+tqdm==4.32.2
+scipy
+matplotlib
+ipython==7.6.1
+h5py
