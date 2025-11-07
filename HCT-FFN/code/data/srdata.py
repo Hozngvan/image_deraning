@@ -31,13 +31,18 @@ class SRData(data.Dataset):
         self.begin, self.end = list(map(lambda x: int(x), data_range))
         self._set_filesystem(args.dir_data)
         if args.ext.find('img') < 0:
+            # print("make bin")
             path_bin = os.path.join(self.apath, 'bin')
             os.makedirs(path_bin, exist_ok=True)
 
         list_hr, list_lr = self._scan()
+        print("list_hr length:", len(list_hr))
+        print("list_lr length:", len(list_lr))
+        
         if args.ext.find('bin') >= 0:
             # Binary files are stored in 'bin' folder
             # If the binary file exists, load it. If not, make it.
+            print("did bin")
             list_hr, list_lr = self._scan()
             self.images_hr = self._check_and_load(
                 args.ext, list_hr, self._name_hrbin()
@@ -48,6 +53,7 @@ class SRData(data.Dataset):
             ]
         else:
             if args.ext.find('img') >= 0 or benchmark:
+                print("did bin 1")
                 self.images_hr, self.images_lr = list_hr, list_lr
             elif args.ext.find('sep') >= 0:
                 os.makedirs(
@@ -62,9 +68,10 @@ class SRData(data.Dataset):
                         ),
                         exist_ok=True
                     )
-                
+                print("did bin 2")
                 self.images_hr, self.images_lr = [], [[] for _ in self.scale]
                 for h in list_hr:
+                    # print("did")
                     b = h.replace(self.apath, path_bin)
                     b = b.replace(self.ext[0], '.pt')
                     self.images_hr.append(b)
@@ -82,15 +89,20 @@ class SRData(data.Dataset):
                         )
 
         if train:
+            # print("len(self.images_hr):", len(self.images_hr))
+            # print("args.batch_size:", args.batch_size)
             self.repeat \
                = args.test_every // (len(self.images_hr) // args.batch_size)
 
 
     # Below functions as used to prepare images
     def _scan(self):
+        # print("dir_hr", self.dir_hr)
+        # print("Exists?", os.path.exists(self.dir_hr))
         names_hr = sorted(
             glob.glob(os.path.join(self.dir_hr, '*' + self.ext[0]))
         )
+        
         names_lr = [[] for _ in self.scale]
         for f in names_hr:
             #f = f.replace('.png','x2.png')

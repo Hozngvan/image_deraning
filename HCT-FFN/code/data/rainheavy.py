@@ -6,9 +6,11 @@ class RainHeavy(srdata.SRData):
         super(RainHeavy, self).__init__(
             args, name=name, train=train, benchmark=benchmark
         )
+        
 
     def _scan(self):
         names_hr, names_lr = super(RainHeavy, self)._scan()
+        print("names_hr length RainHeavy:", len(names_hr))
         names_hr = names_hr[self.begin - 1:self.end]
         names_lr = [n[self.begin - 1:self.end] for n in names_lr]
 
