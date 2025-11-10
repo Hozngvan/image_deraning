@@ -151,9 +151,16 @@ class _MSDataLoaderIter:
             except StopIteration:
                 raise StopIteration
 
+            # batch = self.collate_fn([self.dataset[i] for i in batch_indices])
+            # batch = batch + (0,) if isinstance(batch, tuple) else batch + [0]
+            # return tuple(batch) if not isinstance(batch, tuple) else batch
+        
             batch = self.collate_fn([self.dataset[i] for i in batch_indices])
-            batch = batch + (0,) if isinstance(batch, tuple) else batch + [0]
-            return tuple(batch) if not isinstance(batch, tuple) else batch
+            if isinstance(batch, tuple) and len(batch) < 3:
+                batch = batch + (0,)
+            elif not isinstance(batch, tuple):
+                batch = batch + [0]
+            return batch
 
         # Multi-worker mode
         while True:
