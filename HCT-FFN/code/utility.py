@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 
 import numpy as np
 import scipy.misc as misc
+import imageio.v2 as imageio
 
 import torch
 import torch.optim as optim
@@ -124,7 +125,12 @@ class checkpoint():
         for v, p in zip(save_list, postfix):
             normalized = v[0].data.mul(255 / self.args.rgb_range)
             ndarr = normalized.byte().permute(1, 2, 0).cpu().numpy()
-            misc.imsave('{}{}.png'.format(filename, p), ndarr)
+            # Nếu ảnh là grayscale (1 channel) thì bỏ channel trống
+            if ndarr.shape[2] == 1:
+                ndarr = ndarr[:, :, 0]
+
+            imageio.imwrite(f'{filename}{p}.png', ndarr)
+            
 def quantize(img, rgb_range):
     pixel_range = 255 / rgb_range
     return img.mul(pixel_range).clamp(0, 255).round().div(pixel_range)
