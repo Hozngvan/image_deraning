@@ -48,7 +48,7 @@ def _ms_loop(dataset, index_queue, data_queue, collate_fn, scale, seed, init_fn,
             batch = batch + (idx_scale,) if isinstance(batch, tuple) else batch + [idx_scale]
             # Đảm bảo luôn là tuple để đồng nhất
             if not isinstance(batch, tuple):
-                batch = tuple(batch)
+                batch = tuple(batch)    
         except Exception:
             data_queue.put((idx, ExceptionWrapper(sys.exc_info())))
         else:
@@ -56,7 +56,7 @@ def _ms_loop(dataset, index_queue, data_queue, collate_fn, scale, seed, init_fn,
 
 
 class _MSDataLoaderIter:
-    """Phiên bản tương thích PyTorch 2.x+, đã sửa toàn bộ lỗi."""
+    """Phiên bản tương thích PyTorch 2.x+"""
 
     def __init__(self, loader):
         self.dataset = loader.dataset
@@ -156,10 +156,9 @@ class _MSDataLoaderIter:
             # return tuple(batch) if not isinstance(batch, tuple) else batch
         
             batch = self.collate_fn([self.dataset[i] for i in batch_indices])
-            if isinstance(batch, tuple) and len(batch) < 3:
-                batch = batch + (0,)
-            elif not isinstance(batch, tuple):
-                batch = batch + [0]
+           
+            if isinstance(batch, (tuple, list)) and len(batch) == 2:
+                batch = (*batch, 0)
             return batch
 
         # Multi-worker mode
